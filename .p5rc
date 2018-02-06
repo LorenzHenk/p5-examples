@@ -5,6 +5,7 @@
     "dodge",
     "draw",
     "10print",
-    "clock"
+    "clock",
+    "text_points"
   ]
 }
