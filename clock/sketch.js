@@ -1,5 +1,6 @@
 var radius
 var w = 25
+var cr //the base color
 
 
 function setup() {
@@ -20,10 +21,24 @@ function draw() {
 	stroke(255)
 	noFill()
 
+	cr = millis() / 1000
+
+
+
+	//milliseconds
+	let msc = new Date().getMilliseconds()
+	let msa = map(msc,0,1000,0.001,360)
+	stroke((300+cr)%360,100,100)
+	push()
+	strokeWeight(w-5)
+	arc(0,0,radius*2-2*w+2.5,radius*2-2*w+2.5,(msa+360-90)%360,msa)
+	pop()
+
+
 	//seconds
 	let sc = second()
 	let sa = map(sc,0,60,0.001,360)
-	stroke(0,100,100)
+	stroke(cr%360,100,100)
 	push()
 	rotate(sa)
 	line(0,0,radius*0.8,0)
@@ -33,12 +48,12 @@ function draw() {
 	rotate(-90)
 	text((sc < 10)?"0"+sc:sc,0,0,w,w)
 	pop()
-	arc(0,0,radius*2,radius*2,0,sa)
+	arc(0,0,radius*2,radius*2,0,map(sc+msc/1000,0,60,0.001,360))
 
 	//minutes
 	let mi = minute()
 	let ma = map(mi+sa/360,0,60,0.001,360)
-	stroke(100,100,100)
+	stroke((100+cr)%360,100,100)
 	push()
 	rotate(ma)
 	line(0,0,radius*0.8*0.8,0)
@@ -53,7 +68,7 @@ function draw() {
 	//hours
 	let hr = hour()
 	let ha = map((hr+ma/360)%12,0,12,0.001,360)
-	stroke(200,100,100)
+	stroke((200+cr)%360,100,100)
 	push()
 	rotate(ha)
 	line(0,0,radius*0.8*0.8*0.8,0)
