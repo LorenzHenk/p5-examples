@@ -1,22 +1,24 @@
-var drawing = false;
-var sketch;
-var time = 0;
-var mouseDown = false;
+var drawing = false
+var sketch
+var time = 0
+var mouseDown = false
+var bounds
 
-var cursors = 4;
+var cursors = 4
 var lineColor = 0
 var fraction = 0.93
 var symmetry = false
 var spiral = false
 var lineWidth = 3
-var pointDistance = 50;
+var pointDistance = 50
+var displayCursors = true
 
 
 function setup() {
 	createCanvas(windowWidth-250, windowHeight);
 	colorMode(HSB)
 	stroke(255)
-
+	bounds = createVector(width/2+500,height/2+500)
 	gui = createGui('p5.gui',width+50,0)
 	sliderRange(1,100,1)
 	gui.addGlobals('cursors')
@@ -28,7 +30,7 @@ function setup() {
 	gui.addGlobals('lineWidth')
 	sliderRange(5,200,5)
 	gui.addGlobals('pointDistance')
-	gui.addGlobals('symmetry','spiral')
+	gui.addGlobals('symmetry','spiral','displayCursors')
 
 
 	sketch = new Sketch()
@@ -43,20 +45,22 @@ function draw() {
 	}
 
 	sketch.draw()
-	var x = mouseX-width/2
-	var y = mouseY-height/2
-	for(var j = 0; j < (spiral?4:1); j++,x *= (0.67),y *= (0.67)){
-		for(var pi = 0;pi < TWO_PI; pi += TWO_PI/cursors){
+	if(displayCursors) {
+		var x = mouseX-width/2
+		var y = mouseY-height/2
+		for(var j = 0; j < (spiral?4:1); j++,x *= (0.67),y *= (0.67)){
+			for(var pi = 0;pi < TWO_PI; pi += TWO_PI/cursors){
 
-			push()	
-			fill('rgba(255,255,255,0.7)')
-			strokeWeight(lineWidth)
+				push()	
+				fill('rgba(255,255,255,0.7)')
+				strokeWeight(lineWidth)
 
-			rotate(pi)
-			point(x,y)
-			symmetry && point(-x,y)
+				rotate(pi)
+				point(x,y)
+				symmetry && point(-x,y)
 
-			pop()
+				pop()
+			}
 		}
 	}
 	drawing = mouseDown;
@@ -93,7 +97,8 @@ class Sketch {
 	addLine(mx,my,pmx,pmy) {
 		if(drawing && this.points.length) {
 			//i1 i2 color cursors symmetry spiral
-			this.lines.push([this.points.length-1,this.points.length,lineColor+this.points[this.points.length-1].v.mag()*4,cursors,symmetry,spiral,lineWidth]);
+			this.lines.push([this.points.length-1,this.points.length,lineColor+this.points[this.points.length-1].v.mag()*4
+							,cursors,symmetry,spiral,lineWidth]);
 		}
 			
 		var v = createVector(pmx-mx,pmy-my)
@@ -101,7 +106,21 @@ class Sketch {
 	}
 
 	draw() {
-		for(let l of this.lines) {
+		for(let li = 0; li < this.lines.length; li++) {
+			let l = this.lines[li]
+			{
+				let test = false
+				let p1 = this.points[l[0]]
+				if(p1.p.mag() > bounds.mag()){
+					test = true
+				}
+				let p2 = this.points[l[1]]
+				if(test && p2.p.mag() > bounds.mag()){
+					this.lines.splice(li,1)
+					li--
+					continue
+				}
+			}
 			push()
 			stroke(l[2],100,100) //color
 			strokeWeight(l[6])

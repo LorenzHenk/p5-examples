@@ -19,3 +19,12 @@ There are several variables which can be changed:
    Turn mirroring towards the y-axis translated to the center on/off.
 7. spiral
    Turn on/off spiraling towards the center of the canvas. If on, 3 additional points for each cursor (and each mirrored cursor) are created.
+8. displayCursors
+   Set visibility of cursors.
+
+## Try out:
+
+Try out the following:
+1. set cursors to 100
+2. set fraction to 0.999
+3. have fun
