@@ -5,13 +5,16 @@ var mouseDown = false
 var bounds
 
 var cursors = 4
-var lineColor = 0
+var lineColor = "#00aaff"
 var fraction = 0.93
 var symmetry = false
 var spiral = false
 var lineWidth = 3
 var pointDistance = 50
 var displayCursors = true
+var isBlurry = true
+
+var timeStopped = false
 
 
 function setup() {
@@ -19,10 +22,9 @@ function setup() {
 	colorMode(HSB)
 	stroke(255)
 	bounds = createVector(width/2+500,height/2+500)
-	gui = createGui('p5.gui',width+50,0)
+	let gui = createGui('p5.gui',width+50,0)
 	sliderRange(1,100,1)
 	gui.addGlobals('cursors')
-	sliderRange(0,320,5)
 	gui.addGlobals('lineColor')
 	sliderRange(0.8,0.999,0.001)
 	gui.addGlobals('fraction')
@@ -30,14 +32,19 @@ function setup() {
 	gui.addGlobals('lineWidth')
 	sliderRange(5,200,5)
 	gui.addGlobals('pointDistance')
-	gui.addGlobals('symmetry','spiral','displayCursors')
+	gui.addGlobals('symmetry','spiral','displayCursors', 'isBlurry')
 
 
 	sketch = new Sketch()
 }
 
 function draw() {
-	background(0)
+	if(isBlurry) {
+		background('rgba(0,0,0,0.1)')
+	}
+	else {
+		background(0)
+	}
 	translate(width/2,height/2)
 	if(mouseDown && time < millis()) {
 		sketch.addLine(mouseX-width/2,mouseY-height/2,pmouseX-width/2,pmouseY-height/2)
@@ -51,7 +58,7 @@ function draw() {
 		for(var j = 0; j < (spiral?4:1); j++,x *= (0.67),y *= (0.67)){
 			for(var pi = 0;pi < TWO_PI; pi += TWO_PI/cursors){
 
-				push()	
+				push()
 				fill('rgba(255,255,255,0.7)')
 				strokeWeight(lineWidth)
 
@@ -70,6 +77,9 @@ function draw() {
 function keyPressed() {
 	if(keyCode == 32) {
 		sketch = new Sketch()
+	} else if (keyCode == 84) {
+		// pressed "t" -> time stop
+		timeStopped = !timeStopped
 	}
 }
 
@@ -96,11 +106,12 @@ class Sketch {
 	//mouseX mouseY pmouseX pmouseY
 	addLine(mx,my,pmx,pmy) {
 		if(drawing && this.points.length) {
+			console.log(lineColor)
 			//i1 i2 color cursors symmetry spiral
-			this.lines.push([this.points.length-1,this.points.length,lineColor+this.points[this.points.length-1].v.mag()*4
+			this.lines.push([this.points.length-1,this.points.length,hue(lineColor)+this.points[this.points.length-1].v.mag()*4
 							,cursors,symmetry,spiral,lineWidth]);
 		}
-			
+
 		var v = createVector(pmx-mx,pmy-my)
 		this.points.push(new Point(mx,my,v.mult(-0.1)))
 	}
@@ -141,8 +152,10 @@ class Sketch {
 			pop()
 		}
 
-		for(let p of this.points) {
-			p.update()
+		if(!timeStopped) {
+			for(let p of this.points) {
+				p.update()
+			}
 		}
 
 	}
