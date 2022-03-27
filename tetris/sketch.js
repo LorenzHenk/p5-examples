@@ -1,7 +1,9 @@
 const SIZE = 40;
 
-const ROW_COUNT = 15;
+const ROW_COUNT = 20;
 const COLUMN_COUNT = 10;
+
+const MAX_HEIGHT = 4;
 
 const COLORS = ["lightblue", "red", "green", "yellow", "purple"];
 
@@ -36,7 +38,7 @@ let highscore = 0;
 let score = 0;
 
 function setup() {
-  createCanvas(400, 600);
+  createCanvas(COLUMN_COUNT * SIZE, ROW_COUNT * SIZE);
   board = new TetrisBoard();
   level = 1;
 
@@ -81,7 +83,7 @@ class TetrisBoard {
     this.tile = TILES[this.tileIndex];
     const size = Math.sqrt(this.tile.length);
     this.tilePosition = {
-      x: Math.floor(Math.random() * (COLUMN_COUNT - size)),
+      x: Math.floor((COLUMN_COUNT - size) / 2),
       y: 0,
     };
     this.tileColorIndex = 0;
@@ -138,6 +140,10 @@ class TetrisBoard {
         }
       }
     }
+
+    stroke("red");
+    line(0, MAX_HEIGHT * SIZE, width, MAX_HEIGHT * SIZE);
+    stroke("black");
   }
 
   drawScore() {
@@ -188,7 +194,12 @@ class TetrisBoard {
       i++;
     }
 
-    if (this.board[0].some((x) => x)) {
+    if (
+      this.board
+        .slice(0, MAX_HEIGHT)
+        .flatMap((v) => v)
+        .some((x) => x)
+    ) {
       // lost
       // reset
       this.reset();
@@ -346,7 +357,7 @@ class TetrisBoard {
     this.tile = TILES[this.tileIndex];
     const size = Math.sqrt(this.tile.length);
     this.tilePosition = {
-      x: Math.floor(Math.random() * (COLUMN_COUNT - size)),
+      x: Math.floor((COLUMN_COUNT - size) / 2),
       y: 0,
     };
     this.tileColorIndex = (this.tileColorIndex + 1) % COLORS.length;
