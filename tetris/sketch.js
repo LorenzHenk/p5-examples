@@ -76,7 +76,8 @@ class TetrisBoard {
     this.board = Array.from({ length: ROW_COUNT }).map(() =>
       Array.from({ length: COLUMN_COUNT }).map(() => null),
     );
-    this.tileIndex = 0;
+    this.tileIndex = Math.floor(Math.random() * TILES.length);
+    this.nextTileIndex = Math.floor(Math.random() * TILES.length);
     this.tile = TILES[this.tileIndex];
     const size = Math.sqrt(this.tile.length);
     this.tilePosition = {
@@ -120,6 +121,23 @@ class TetrisBoard {
     }
 
     this.drawScore();
+
+    // draw next tile
+    {
+      const size = Math.sqrt(TILES[this.nextTileIndex].length);
+      for (let i = 0; i < TILES[this.nextTileIndex].length; i++) {
+        let cube = TILES[this.nextTileIndex][i];
+        if (cube) {
+          fill("white");
+          rect(
+            ((i % size) * SIZE) / 4 + 5,
+            (Math.floor(i / size) * SIZE) / 4 + 5,
+            SIZE / 4,
+            SIZE / 4,
+          );
+        }
+      }
+    }
   }
 
   drawScore() {
@@ -322,7 +340,8 @@ class TetrisBoard {
   }
 
   newTile() {
-    this.tileIndex = Math.floor(Math.random() * TILES.length);
+    this.tileIndex = this.nextTileIndex;
+    this.nextTileIndex = Math.floor(Math.random() * TILES.length);
     this.tile = TILES[this.tileIndex];
     const size = Math.sqrt(this.tile.length);
     this.tilePosition = {
