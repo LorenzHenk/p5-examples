@@ -221,6 +221,7 @@ class TetrisBoard {
         {
           if (this.tileCanMoveDown(this.tile, this.tilePosition)) {
             this.tilePosition.y++;
+            score++;
           }
         }
         break;
